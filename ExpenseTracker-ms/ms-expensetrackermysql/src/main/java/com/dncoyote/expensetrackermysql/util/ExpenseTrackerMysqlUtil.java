@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dncoyote.expensetrackermysql.DTO.MonthlyStatementRequestDto;
 import com.dncoyote.expensetrackermysql.model.MonthlyStatement;
 import com.dncoyote.expensetrackermysql.service.ExpenseTrackerMysqlService;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -29,27 +30,32 @@ public class ExpenseTrackerMysqlUtil implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        try {
-            truncate();
-            // String[] years = new String[] { "2022", "2023" };
-            // String[] months = new String[] { "January", "February", "March", "April",
-            // "May", "June", "July",
-            // "August",
-            // "September", "October", "November", "December" };
-            // for (String year : years) {
-            // for (String month : months) {
-            MonthlyStatementRequestDto reqDto = new MonthlyStatementRequestDto("october", "2023", null, null);
-            List<MonthlyStatement> response = googleApiUtil.getDataFromGoogleSheet(reqDto);
-            expenseTrackerMysqlService.saveAll(response);
-            // }
-            // }
 
-        } catch (
+        truncate();
+        String[] years = new String[] { "2022", "2023" };
+        String[] months = new String[] { "January", "February", "March", "April",
+                "May", "June", "July",
+                "August",
+                "September", "October", "November", "December" };
+        for (String year : years) {
+            for (String month : months) {
+                try {
+                    MonthlyStatementRequestDto reqDto = new MonthlyStatementRequestDto(month, year, null, null);
+                    List<MonthlyStatement> response = googleApiUtil.getDataFromGoogleSheet(reqDto);
+                    expenseTrackerMysqlService.saveAll(response);
+                } catch (GoogleJsonResponseException e) {
+                    // Handle the exception gracefully, e.g., log it
+                    continue;
+                    // e.printStackTrace(); // You can replace this with your preferred logging
+                    // mechanism
 
-        Exception e) {
-            // Handle the exception gracefully, e.g., log it
-            e.printStackTrace(); // You can replace this with your preferred logging mechanism
+                } catch (Exception e) {
+                    // Handle the exception gracefully, e.g., log it
+                    e.printStackTrace(); // You can replace this with your preferred logging mechanism
+                }
+            }
         }
+
     }
 
     private void truncate() {

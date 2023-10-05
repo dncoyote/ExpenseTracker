@@ -9,6 +9,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
@@ -100,6 +101,8 @@ public class GoogleApiUtil {
             response = service.spreadsheets().values()
                     .get(spreadSheetId, range)
                     .execute();
+        } catch (GoogleJsonResponseException e) {
+            throw e;
         } catch (IOException e) {
             // Log the error message or rethrow the exception for further analysis
             e.printStackTrace();
