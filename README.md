@@ -1,4 +1,4 @@
-# Expense Tracker Application
+# Patch Pocket : Expense Tracker Application
 
 This is a simple Expense Tracker application that helps you manage your expenses. The application allows you to read and track expenses from a Google Sheets document.
 
