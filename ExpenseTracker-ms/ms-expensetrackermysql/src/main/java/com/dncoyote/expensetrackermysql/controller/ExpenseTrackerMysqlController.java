@@ -50,20 +50,38 @@ public class ExpenseTrackerMysqlController {
             throws GeneralSecurityException, IOException, NumberFormatException, ParseException {
         try {
             List<MonthlyStatement> expenses = expenseTrackerMysqlService.getStatements(reqDto);
+            List<MonthlyStatementResponseDto> responseList = new ArrayList<>();
+            if (expenses == null || expenses.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(new Response<>(ExpenseTrackerConstants.ERROR_MESSAGE, null, 400));
+            } else {
+                MonthlyStatementResponseDto response = new MonthlyStatementResponseDto(expenses,
+                        ExpenseCalculatorService.calculateDebitSum(expenses),
+                        ExpenseCalculatorService.calculateCreditSum(expenses),
+                        ExpenseCalculatorService.calculateBalance(expenses));
+                responseList.add(response);
+                responseList.isEmpty();
+                return ResponseEntity
+                        .ok(new Response<List<MonthlyStatementResponseDto>>(ExpenseTrackerConstants.SUCCESS_MESSAGE,
+                                responseList, 0));
+            }
             // if (!(expenses == null || expenses.isEmpty()) && null != reqDto.getSortBy()
             // && null != reqDto.getSortOrder()) {
             // expenses = googleApiService.sortMonthlyStatement(expenses,
             // reqDto.getSortBy(), reqDto.getSortOrder());
             // }
-            List<MonthlyStatementResponseDto> responseList = new ArrayList<>();
-            MonthlyStatementResponseDto response = new MonthlyStatementResponseDto(expenses,
-                    ExpenseCalculatorService.calculateDebitSum(expenses),
-                    ExpenseCalculatorService.calculateCreditSum(expenses),
-                    ExpenseCalculatorService.calculateBalance(expenses));
-            responseList.add(response);
-            return ResponseEntity
-                    .ok(new Response<List<MonthlyStatementResponseDto>>(ExpenseTrackerConstants.SUCCESS_MESSAGE,
-                            responseList, 0));
+            // List<MonthlyStatementResponseDto> responseList = new ArrayList<>();
+            // MonthlyStatementResponseDto response = new
+            // MonthlyStatementResponseDto(expenses,
+            // ExpenseCalculatorService.calculateDebitSum(expenses),
+            // ExpenseCalculatorService.calculateCreditSum(expenses),
+            // ExpenseCalculatorService.calculateBalance(expenses));
+            // responseList.add(response);
+            // responseList.isEmpty();
+            // return ResponseEntity
+            // .ok(new
+            // Response<List<MonthlyStatementResponseDto>>(ExpenseTrackerConstants.SUCCESS_MESSAGE,
+            // responseList, 0));
         } catch (ExpenseTrackerException e) {
             // Handle custom application-specific exception
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
