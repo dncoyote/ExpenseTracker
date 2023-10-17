@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>ms-expensetracker</module>
+        <module>ms-expensetrackermysql</module>
         <!-- <module>ms-expense</module>
     <module>ms-gateway</module> -->
     </modules>
